@@ -4,40 +4,15 @@ from openai import OpenAI
 import json
 from pydantic import BaseModel
 
+# Using an item based approach allows the LLM to pick the store and not the items.
+
 class Item(BaseModel):
     item_name: str
+    item_store: str
+    item_aisle: str
 
-class Aisle(BaseModel):
-    aisle_name: str
-    items_in_aisle: list[Item]
-
-class Store(BaseModel):
-    store_name: str
-    store_aisles: list[Aisle]
-
-class Stores(BaseModel):
-    store_list: list[Store]
-
-
-"""
-The response will look something like this:
-
-{
-    "stores": {
-        "EDEKA": {
-            "aisles": {
-                "Obst und Gemüse": {
-                    "items": [
-                        {"name": "Äpfel"},
-                        {"name": "Bananen"}
-                    ]
-                }
-            }
-        }
-    }
-}
-"""
-
+class Items(BaseModel):
+    items : list[Item]
 
 class HomeAssistantInterface:
     def __init__(self, api_url, api_key):
@@ -59,7 +34,7 @@ class OpenAIInterface:
         self.system_message = system_message
         self.model = model
 
-    def call(self, message, format=Stores):
+    def call(self, message, format=Item):
         # https://platform.openai.com/docs/guides/structured-outputs
 
         response = self.client.responses.parse(
@@ -108,30 +83,66 @@ def main():
     clean_shopping_list = [i for i in current_shopping_list if (i['name'][0] not in ["+", "-", "="])]
 
     # since cheap gpt models tend to "forget" some items, check the length.
-    clean_shopping_list_length = len(clean_shopping_list)
+    item_count = len(clean_shopping_list)
 
-    response = oai_interface.call(json.dumps(clean_shopping_list), format=Stores)
-    json_data = json.loads(response.model_dump_json())
+    tries = 0
+    item_major_list = []
+    success = False
 
-    #print(json.dumps(json_data["store_list"]))
+    while tries < config['api']['openai']['retries_on_item_drop']:
+        response = oai_interface.call(json.dumps(clean_shopping_list), format=Items)
+        json_data = json.loads(response.model_dump_json())
+        item_major_list = json_data["items"]
+        #print(json.dumps(item_major_list, indent=4))
+
+        new_item_count = len(item_major_list)
+
+        print(str(item_count) + " => " + str(new_item_count))
+        if item_count != new_item_count:
+            print("Warning: Some items may have been forgotten.")
+            print("Old: ", item_count)
+            print("New: ", new_item_count)
+            tries += 1
+            print("Retrying...")
+        else:
+            success = True
+            break
+    if not success:
+        print("Error: Item sorting failed after multiple attempts.")
+        return
+
+    # “transpose” to store aisles major format
+    location_major_list = []
+    for store in config["stores"]:
+        tmp_sl_for_store = []
+        for aisle in store["aisles"]:
+            tmp_sl_for_aisle = []
+            for item in item_major_list:
+                if item["item_store"] == store["name"] and item["item_aisle"] == aisle["name"]:
+                    tmp_sl_for_aisle.append(item["item_name"])
+            if tmp_sl_for_aisle:
+                tmp_sl_for_store.append({
+                    "aisle_name": aisle["name"],
+                    "items_in_aisle": tmp_sl_for_aisle
+                })
+        if tmp_sl_for_store:
+            location_major_list.append({
+                "store_name": store["name"],
+                "store_aisles": tmp_sl_for_store
+            })
+
+    #print(json.dumps(store_aisles_major_list, indent=4))
 
     new_shopping_list = []
-    for store in json_data['store_list']:
+    for store in location_major_list:
         if store['store_aisles'] not in [None, [], {}]:
             new_shopping_list.append("+++ " + store['store_name'] + " +++")
             for aisle in store['store_aisles']:
                 if aisle['items_in_aisle'] not in [None, [], {}]:
                     #new_shopping_list.append("--- " + aisle['aisle_name'] + " ---")
                     for item in aisle['items_in_aisle']:
-                        new_shopping_list.append(item['item_name'])
-
-    clean_new_shopping_list = [i for i in new_shopping_list if (i[0] not in ["+", "-", "="])]
-    clean_new_shopping_list_length = len(clean_new_shopping_list)
-    if clean_new_shopping_list_length != clean_shopping_list_length:
-        print("Warning: Some items may have been forgotten.")
-        print("Old: ", clean_shopping_list_length)
-        print("New: ", clean_new_shopping_list_length)
-
+                        new_shopping_list.append(item)
+    
     for s in new_shopping_list:
         print(s)
 
