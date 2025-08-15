@@ -1,4 +1,5 @@
 import requests
+import re
 from openai import OpenAI
 import json
 from pydantic import BaseModel
@@ -90,6 +91,9 @@ def main():
     # Read configuration from JSON file
     with open('config.json', 'r') as config_file:
         config = json.load(config_file)
+
+    domain = re.match(r"https?://([^/]+)", config["api"]["homeassistant"]["url"]).group(1)
+    config["api"]["homeassistant"]["url"] = f"https://{domain}/api/"
 
     ha_interface = HomeAssistantInterface(
         api_url=config['api']['homeassistant']['url'],
