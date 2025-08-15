@@ -53,6 +53,39 @@ def generate_system_message(system_message, stores):
 
     return system_prompt
 
+def item_major2location_major(item_major_list, stores):
+    location_major_list = []
+    for store in stores:
+        tmp_sl_for_store = []
+        for aisle in store["aisles"]:
+            tmp_sl_for_aisle = []
+            for item in item_major_list:
+                if item["item_store"] == store["name"] and item["item_aisle"] == aisle["name"]:
+                    tmp_sl_for_aisle.append(item["item_name"])
+            if tmp_sl_for_aisle:
+                tmp_sl_for_store.append({
+                    "aisle_name": aisle["name"],
+                    "items_in_aisle": tmp_sl_for_aisle
+                })
+        if tmp_sl_for_store:
+            location_major_list.append({
+                "store_name": store["name"],
+                "store_aisles": tmp_sl_for_store
+            })
+    return location_major_list
+
+def shopping_list_from_json(json_data):
+    new_shopping_list = []
+    for store in json_data:
+        if store['store_aisles'] not in [None, [], {}]:
+            new_shopping_list.append("+++ " + store['store_name'] + " +++")
+            for aisle in store['store_aisles']:
+                if aisle['items_in_aisle'] not in [None, [], {}]:
+                    #new_shopping_list.append("--- " + aisle['aisle_name'] + " ---")
+                    for item in aisle['items_in_aisle']:
+                        new_shopping_list.append(item)
+    return new_shopping_list
+
 def main():
     # Read configuration from JSON file
     with open('config.json', 'r') as config_file:
@@ -86,9 +119,14 @@ def main():
         item_major_list = json_data["items"]
         #print(json.dumps(item_major_list, indent=4))
 
-        new_item_count = len(item_major_list)
+        # “transpose” to store aisles major format
+        location_major_list = item_major2location_major(item_major_list, config["stores"])
+        new_shopping_list = shopping_list_from_json(location_major_list)
+
+        new_item_count = len([s for s in new_shopping_list if s[0] not in ["+", "-", "="]])
 
         print(str(item_count) + " => " + str(new_item_count))
+
         if item_count != new_item_count:
             print("Warning: Some items may have been forgotten.")
             print("Old: ", item_count)
@@ -102,38 +140,7 @@ def main():
         print("Error: Item sorting failed after multiple attempts.")
         return
 
-    # “transpose” to store aisles major format
-    location_major_list = []
-    for store in config["stores"]:
-        tmp_sl_for_store = []
-        for aisle in store["aisles"]:
-            tmp_sl_for_aisle = []
-            for item in item_major_list:
-                if item["item_store"] == store["name"] and item["item_aisle"] == aisle["name"]:
-                    tmp_sl_for_aisle.append(item["item_name"])
-            if tmp_sl_for_aisle:
-                tmp_sl_for_store.append({
-                    "aisle_name": aisle["name"],
-                    "items_in_aisle": tmp_sl_for_aisle
-                })
-        if tmp_sl_for_store:
-            location_major_list.append({
-                "store_name": store["name"],
-                "store_aisles": tmp_sl_for_store
-            })
 
-    #print(json.dumps(store_aisles_major_list, indent=4))
-
-    new_shopping_list = []
-    for store in location_major_list:
-        if store['store_aisles'] not in [None, [], {}]:
-            new_shopping_list.append("+++ " + store['store_name'] + " +++")
-            for aisle in store['store_aisles']:
-                if aisle['items_in_aisle'] not in [None, [], {}]:
-                    #new_shopping_list.append("--- " + aisle['aisle_name'] + " ---")
-                    for item in aisle['items_in_aisle']:
-                        new_shopping_list.append(item)
-    
     for s in new_shopping_list:
         print(s)
 
