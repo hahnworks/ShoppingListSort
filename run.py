@@ -47,19 +47,11 @@ class OpenAIInterface:
 
         return response.output_parsed
 
-def generate_system_message(config):
-    system_message = """
-    Your task is to sort a grocery item list based on the provided stores and their layout.
-    Assign every item a store and (if applicable) a specific aisle.
+def generate_system_message(system_message, stores):
+    system_prompt = system_message
+    system_prompt += json.dumps(stores, indent=4)
 
-    Use only the aisles specified in the following JSON.
-    DO NOT INVENT ANY NEW AISLES.
-    If unsure, use "Miscellaneous" as the aisle.
-    """
-
-    system_message += json.dumps(config['stores'], indent=4)
-
-    return system_message
+    return system_prompt
 
 def main():
     # Read configuration from JSON file
@@ -73,7 +65,7 @@ def main():
     oai_interface = OpenAIInterface(
         api_key=config['api']['openai']['key'],
         model = config['api']['openai']['model'],
-        system_message=generate_system_message(config)
+        system_message=generate_system_message(config["api"]["openai"]["system_message"], config["stores"])
     )
 
     current_shopping_list = ha_interface.get_shopping_list()
