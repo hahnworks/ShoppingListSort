@@ -103,8 +103,7 @@ def main():
 
     current_shopping_list = ha_interface.get_shopping_list()
 
-    #clean_shopping_list = [i for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
-    clean_shopping_list = [i['name'] for i in current_shopping_list if (i['name'][0] not in ["+", "-", "="])]
+    clean_shopping_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
 
     tries = 0
     item_major_list = []
