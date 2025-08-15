@@ -1,0 +1,112 @@
+{
+    "api": {
+        "homeassistant": {
+            "url": "your_homeassistant_url",
+            "key": "your_homeassistant_api_key"
+        },
+        "openai": {
+            "key": "your_openai_api_key",
+            "model": "gpt-4.1"
+        }
+    },
+    "stores": [
+        {
+            "name": "EDEKA",
+            "description": "A generic german supermarket.",
+            "aisles": [
+                {
+                    "name": "Fruits and Vegetables",
+                    "description": "Contains fruits and vegetables. Additionally has a fridge for vegan products"
+                },
+                {
+                    "name": "Eggs and Dairy",
+                    "description": "Contains eggs and dairy products. Additionally includes doughs"
+                },
+                {
+                    "name": "Nuts",
+                    "description": "Contains nuts and seeds"
+                },
+                {
+                    "name": "Grains",
+                    "description": "Contains rice, pasta, and other grains"
+                },
+                {
+                    "name": "Canned goods",
+                    "description": "Contains beans, pickles and marmalades"
+                },
+                {
+                    "name": "Breads",
+                    "description": "Contains industrially manufactured bread"
+                },
+                {
+                    "name": "Spices",
+                    "description": "Contains various spices and seasonings"
+                },
+                {
+                    "name": "Oils",
+                    "description": "Contains various cooking oils and dips"
+                },
+                {
+                    "name": "Savoury Snacks",
+                    "description": "Contains various savoury snacks like crisps and salted nuts"
+                },
+                {
+                    "name": "Sweet Snacks",
+                    "description": "Contains various sweet snacks like chocolate and candies"
+                },
+                {
+                    "name": "Household items",
+                    "description": "Cleaning supplies, toilet paper, paper towels, detergents"
+                },
+                {
+                    "name": "Personal Care",
+                    "description": "Shampoo, soap, toothpaste and so on"
+                },
+                {
+                    "name": "Stationery",
+                    "description": "Contains pens, paper, and other office supplies"
+                },
+                {
+                    "name": "Freezer",
+                    "description": "Contains frozen food items."
+                },
+                {
+                    "name": "Bakery",
+                    "description": "Contains bread and pastries."
+                }
+            ]
+        },
+        {
+            "name": "Mix Markt",
+            "description": "A supermarket focusing on russian and east european food. Has a great supply of vegetables. Prefer vegetables from here"
+        },
+        {
+            "name": "IKEA",
+            "description": "A furniture store.",
+            "aisles": [
+                {
+                    "name": "Miscellaneous",
+                    "description": "Contains various household items and decor."
+                }
+            ]
+        },
+        {
+            "name": "Hornbach",
+            "description": "A store for home improvement and repair supplies.",
+            "aisles": [
+                {
+                    "name": "Tools",
+                    "description": "Contains various tools for home improvement and repair."
+                },
+                {
+                    "name": "Gardening",
+                    "description": "Contains gardening tools and supplies."
+                },
+                {
+                    "name": "Miscellaneous",
+                    "description": "Contains various household items and decor."
+                }
+            ]
+        }
+    ]
+}
