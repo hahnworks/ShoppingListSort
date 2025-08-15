@@ -104,10 +104,7 @@ def main():
     current_shopping_list = ha_interface.get_shopping_list()
 
     #clean_shopping_list = [i for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
-    clean_shopping_list = [i for i in current_shopping_list if (i['name'][0] not in ["+", "-", "="])]
-
-    # since cheap gpt models tend to "forget" some items, check the length.
-    item_count = len(clean_shopping_list)
+    clean_shopping_list = [i['name'] for i in current_shopping_list if (i['name'][0] not in ["+", "-", "="])]
 
     tries = 0
     item_major_list = []
@@ -123,14 +120,11 @@ def main():
         location_major_list = item_major2location_major(item_major_list, config["stores"])
         new_shopping_list = shopping_list_from_json(location_major_list)
 
-        new_item_count = len([s for s in new_shopping_list if s[0] not in ["+", "-", "="]])
+        # prepare clean shopping list, to check whether the LLM has dropped any items
+        clean_new_shopping_list = [s for s in new_shopping_list if s[0] not in ["+", "-", "="]]
 
-        print(str(item_count) + " => " + str(new_item_count))
-
-        if item_count != new_item_count:
-            print("Warning: Some items may have been forgotten.")
-            print("Old: ", item_count)
-            print("New: ", new_item_count)
+        if sorted(clean_shopping_list) != sorted(clean_new_shopping_list):
+            print("Warning: Items have been dropped by the model!")
             tries += 1
             print("Retrying...")
         else:
@@ -138,6 +132,7 @@ def main():
             break
     if not success:
         print("Error: Item sorting failed after multiple attempts.")
+        print("Consider using a more complex model.")
         return
 
 
