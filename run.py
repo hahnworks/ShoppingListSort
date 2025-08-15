@@ -1,4 +1,3 @@
-import configparser
 import requests
 from openai import OpenAI
 import json
