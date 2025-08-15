@@ -18,15 +18,49 @@ class HomeAssistantInterface:
     def __init__(self, api_url, api_key):
         self.api_url = api_url
         self.api_key = api_key
-
-    def get_shopping_list(self):
-        url = self.api_url + "shopping_list"
-        headers = {
+        self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
-        response = requests.get(url, headers=headers)
+
+    def get_shopping_list(self):
+        url = self.api_url + "shopping_list"
+        response = requests.get(url, headers=self.headers)
         return response.json()
+    
+    def add_to_shopping_list(self, names):
+        responses = []
+
+        if not isinstance(names, list):
+            names = [names]
+
+        for i in names:
+            url = self.api_url + "services/shopping_list/add_item"
+            data = {
+                "name": i
+            }
+            response = requests.post(url, headers=self.headers, json=data)
+            responses.append(response.json())
+        return responses
+
+    def drop_from_shopping_list(self, names):
+        responses = []
+
+        if not isinstance(names, list):
+            names = [names]
+
+        for i in names:
+            url = self.api_url + "services/shopping_list/remove_item"
+            data = {
+                "name": i
+            }
+            response = requests.post(url, headers=self.headers, json=data)
+            responses.append(response.json())
+        return responses
+
+    def drop_shopping_list(self, drop_complete=False):
+        shopping_list = self.get_shopping_list()
+        self.drop_from_shopping_list([i["name"] for i in shopping_list if not i["complete"] or drop_complete])
 
 class OpenAIInterface:
     def __init__(self, api_key, system_message = "You are a helpful assistant.", model="gpt-4.1"):
@@ -107,11 +141,15 @@ def main():
 
     current_shopping_list = ha_interface.get_shopping_list()
 
+    print(json.dumps(current_shopping_list, indent=4))
+
     clean_shopping_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
 
     tries = 0
     item_major_list = []
     success = False
+
+    new_shopping_list = []
 
     while tries < config['api']['openai']['retries_on_item_drop']:
         response = oai_interface.call(json.dumps(clean_shopping_list), format=Items)
@@ -138,9 +176,11 @@ def main():
         print("Consider using a more complex model.")
         return
 
-
     for s in new_shopping_list:
         print(s)
+
+    ha_interface.drop_shopping_list(drop_complete=False)
+    ha_interface.add_to_shopping_list(new_shopping_list)
 
 if __name__ == "__main__":
     main()
