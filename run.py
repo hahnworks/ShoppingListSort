@@ -29,7 +29,7 @@ class HomeAssistantInterface:
         return response.json()
 
 class OpenAIInterface:
-    def __init__(self, api_key, system_message = "You are a helpful assistant.", model="gpt-4o"):
+    def __init__(self, api_key, system_message = "You are a helpful assistant.", model="gpt-4.1"):
         self.client = OpenAI(api_key=api_key)
         self.system_message = system_message
         self.model = model
