@@ -65,5 +65,5 @@ TODO
 
 ## TODO
 
-In the long run, this is intended as an integration for Home Assistant using HASS. 
+In the long run, this is intended as an integration for Home Assistant using HACS. 
 I just do not have the time yet to implement this application properly as an integration, but this is the goal.
