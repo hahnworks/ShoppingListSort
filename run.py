@@ -71,12 +71,14 @@ class OpenAIInterface:
     def call(self, message, format=Item):
         # https://platform.openai.com/docs/guides/structured-outputs
 
-        response = self.client.responses.parse(
-            model=self.model,
-            input = [
+        input = [
                 {"role": "system", "content": self.system_message},
                 {"role": "user", "content": message}
-            ],
+            ]
+
+        response = self.client.responses.parse(
+            model=self.model,
+            input=input,
             text_format=format
         )
 
@@ -155,7 +157,6 @@ def main():
         response = oai_interface.call(json.dumps(clean_shopping_list), format=Items)
         json_data = json.loads(response.model_dump_json())
         item_major_list = json_data["items"]
-        #print(json.dumps(item_major_list, indent=4))
 
         # “transpose” to store aisles major format
         location_major_list = item_major2location_major(item_major_list, config["stores"])
