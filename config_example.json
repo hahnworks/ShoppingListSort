@@ -2,7 +2,8 @@
     "api": {
         "homeassistant": {
             "url": "your_homeassistant_url",
-            "key": "your_homeassistant_api_key"
+            "key": "your_homeassistant_api_key",
+            "fetch_interval": 5
         },
         "openai": {
             "key": "your_openai_api_key",

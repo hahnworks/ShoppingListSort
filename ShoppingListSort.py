@@ -3,6 +3,7 @@ import re
 from openai import OpenAI
 import json
 from pydantic import BaseModel
+from time import sleep
 
 # Using an item based approach allows the LLM to pick the store and not the items.
 
@@ -148,7 +149,7 @@ class ShoppingListSorter:
     def sort(self):
         current_shopping_list = self.ha_interface.get_shopping_list()
 
-        clean_item_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
+        clean_item_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "=", "!"])]
 
         tries = 0
         success = False
@@ -159,7 +160,7 @@ class ShoppingListSorter:
             categorized_item_list = self.get_categorized_item_list_from_llm(clean_item_list)
 
             # prepare clean shopping list, to check whether the LLM has dropped any items
-            clean_new_item_list = [s for s in categorized_item_list if s[0] not in ["+", "-", "="]]
+            clean_new_item_list = [s for s in categorized_item_list if s[0] not in ["+", "-", "=", "!"]]
 
             if sorted(clean_item_list) != sorted(clean_new_item_list):
                 print("Warning: Items have been dropped by the model!")
@@ -173,13 +174,19 @@ class ShoppingListSorter:
             print("Consider using a more complex model.")
             return
 
-        for s in categorized_item_list:
-            print(s)
-
         self.ha_interface.drop_shopping_list(drop_complete=False)
         self.ha_interface.add_to_shopping_list(categorized_item_list)
         self.ha_interface.add_to_shopping_list("--- END ---")
 
+    def listen(self):
+        print("Listening...")
+        while True:
+            current_shopping_list = self.ha_interface.get_shopping_list()
+            clean_item_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
+
+            if "!sort" in clean_item_list:
+                self.sort()
+            sleep(self.config['api']['homeassistant']['fetch_interval'])
 
 def generate_system_message(system_message, stores):
     system_prompt = system_message
@@ -193,7 +200,7 @@ def main():
         config = json.load(config_file)
 
     sorter = ShoppingListSorter(config)
-    sorter.sort()
+    sorter.listen()
 
 
 if __name__ == "__main__":
