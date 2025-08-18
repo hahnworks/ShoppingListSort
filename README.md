@@ -12,6 +12,11 @@ Sort your Home Assistant shopping list by store and aisle using OpenAIs GPT mode
 >
 > You can configure the stores and aisles in `config.json` to fit your usecase.
 
+> [!NOTE]
+> This application is in active development.
+> While I tested it and it works perfectly for me, proper error handling in all places has not been implemented yet.
+> **Make sure to open an issue or a pull request if you have any suggestions!**
+
 ![Shopping List Sort Demo](.readme_assets/demo.gif)
 
 ## Motivation
