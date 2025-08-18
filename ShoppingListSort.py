@@ -45,7 +45,7 @@ class HomeAssistantInterface:
         url = self.api_url + "shopping_list"
         response = requests.get(url, headers=self.headers)
         return response.json()
-    
+
     def add_to_shopping_list(self, names):
         responses = []
 
