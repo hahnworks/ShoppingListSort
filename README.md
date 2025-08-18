@@ -21,7 +21,7 @@ By default, ShoppingListSort listens for new items.
 You can add `!sort` to your shopping list, which triggers the resorting.
 Every item starting with `+`, `-`, `=` and `!` is ignored and dropped, as these are consider as formatting.
 
-To start listening, set up the [configuraiton](#configuration) and call `python ShoppingListSort.py`.
+To start listening, set up the [configuration](#configuration) and call `python ShoppingListSort.py`.
 
 
 ## Configuration
@@ -35,8 +35,8 @@ After editing save it as `config.json`.
 ### API and models
 
 You have to provide this application with your Home Assistant instance and an API key.
-Additionally, you have to provide it with a valid OpenAI api key and the model you want to use.
-As for the models, `gpt-4.1-nano` regularly drops items and is unusuable, while `gpt-4.1-mini` seems to work consistently well.
+Additionally, you have to provide it with a valid OpenAI API key and the model you want to use.
+As for the models, `gpt-4.1-nano` regularly drops items and is unusable, while `gpt-4.1-mini` seems to work consistently well.
 Should you ever encounter issues, you can try `gpt-4.1`, which never had any issues, even with less descriptive system prompts.
 
 Note, that you should pick a model which supports [Structured Outputs](https://openai.com/index/introducing-structured-outputs-in-the-api/) as this application relies on them to ensure an accurate response.
@@ -98,8 +98,9 @@ Here is a shortened version of the `stores` section in `config_example.json` for
 ]
 ```
 
-## TODO
+## TODOs
 
-- [ ] HACS
+- [ ] rewrite as Home Assistant Integration and add to HACS
 - [ ] Support for Ollama and more LLM providers
 - [ ] Error handling
+- [ ] Command Line interface
