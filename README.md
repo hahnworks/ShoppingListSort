@@ -1,6 +1,6 @@
 # ✏️📋🛒 Shopping List Sort
 
-Sort your Home Assistant shopping list by store and aisle using OpenAIs GPT models!
+Sort your Home Assistant shopping list by store and aisle using OpenAIs GPT models just by adding `!sort` to the list!
 
 ![Shopping List Sort Demo](.readme_assets/demo.gif)
 
