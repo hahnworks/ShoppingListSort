@@ -189,20 +189,30 @@ class ShoppingListSorter:
         if not success:
             print("Error: Item sorting failed after multiple attempts.")
             print("Consider using a more complex model.")
-            return
+            return False
 
         self.ha_interface.drop_shopping_list(drop_complete=False)
         self.ha_interface.add_to_shopping_list(categorized_item_list)
         self.ha_interface.add_to_shopping_list("--- END ---")
+        return True
 
-    def listen(self):
-        print("Listening...")
+    def listen(self, verbose=True):
+        if verbose:
+            print("Listening...")
         while True:
             current_shopping_list = self.ha_interface.get_shopping_list()
             clean_item_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
 
             if "!sort" in clean_item_list:
-                self.sort()
+                if verbose:
+                    print("Sorting...", end="")
+                if not self.sort():
+                    print(" failed.")
+                    self.ha_interface.drop_from_shopping_list("!sort")
+                    self.ha_interface.add_to_shopping_list("!sort failed")
+                else:
+                    print(" done.")
+            
             sleep(self.config['api']['homeassistant']['fetch_interval'])
 
 def generate_system_message(system_message, stores):
