@@ -2,6 +2,16 @@
 
 Sort your Home Assistant shopping list by store and aisle using OpenAIs GPT models just by adding `!sort` to the list!
 
+> [!TIP]
+> Quickstart:
+> - Make sure you have the [OpenAI Python API library](https://pypi.org/project/openai/) installed.
+> - Rename `config_example.json` to `config.json`.
+> - Add your Home Assistant URL and API key and your OpenAI API key.
+> - Run `python ShoppingListSort.py`.
+> - Try adding `!sort` to your Shopping List.
+>
+> You can configure the stores and aisles in `config.json` to fit your usecase.
+
 ![Shopping List Sort Demo](.readme_assets/demo.gif)
 
 ## Motivation
