@@ -71,8 +71,8 @@ Here is a shortened version of the `stores` section in `config_example.json` for
 ```json
 "stores": [
     {
-        "name": "EDEKA",
-        "description": "A generic german supermarket.",
+        "name": "Supermarket",
+        "description": "A generic supermarket.",
         "aisles": [
             {
                 "name": "Fruits and Vegetables",
@@ -89,8 +89,8 @@ Here is a shortened version of the `stores` section in `config_example.json` for
         ]
     },
     {
-        "name": "IKEA",
-        "description": "Furniture store, which sells household items and some electronics as well"
+        "name": "Swedish furniture store",
+        "description": "A well-known swedish furniture store, selling furniture and home accessories.",
         "aisles": [
             {
                 "name": "Kitchen accessories",
@@ -118,4 +118,4 @@ Here is a shortened version of the `stores` section in `config_example.json` for
 - [ ] rewrite as Home Assistant Integration and add to HACS
 - [ ] Support for Ollama and more LLM providers
 - [ ] Error handling
-- [ ] Command Line interface
+- [ ] Command line arguments
