@@ -14,6 +14,11 @@ You have to define a list of stores and aisles. See the [Configuration Section](
 
 ## Usage
 
+As this application currently is not a Home Assistant integration, but merely uses its REST API, you have to call it manually from any device which is able to access your Home Assistant server.
+
+Setting up the [Configuraiton](#configuration) and calling `python shoppinglistsort.py suffices.`
+
+
 ## Configuration
 
 If you rather read examples instead of explanation, take a look at `config_example.json`.
@@ -92,3 +97,4 @@ Here is a shortened version of the `stores` section in `config_example.json` for
 
 - [ ] HACS
 - [ ] Support for Ollama and more LLM providers
+- [ ] Error handling
