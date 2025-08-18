@@ -152,7 +152,7 @@ class ShoppingListSorter:
         return new_shopping_list
 
 
-    def get_categorized_item_list_from_llm(self, item_list):
+    def _get_categorized_item_list_from_llm(self, item_list):
             response = self.oai_interface.call(json.dumps(item_list), format=Items)
             json_data = json.loads(response.model_dump_json())
             item_major_list = json_data["items"]
@@ -174,7 +174,7 @@ class ShoppingListSorter:
 
         while tries < self.config['api']['openai']['retries_on_item_drop']:
 
-            categorized_item_list = self.get_categorized_item_list_from_llm(clean_item_list)
+            categorized_item_list = self._get_categorized_item_list_from_llm(clean_item_list)
 
             # prepare clean shopping list, to check whether the LLM has dropped any items
             clean_new_item_list = [s for s in categorized_item_list if s[0] not in ["+", "-", "=", "!"]]
