@@ -21,8 +21,12 @@
                     "description": "Contains fruits and vegetables. Additionally has a fridge for vegan products"
                 },
                 {
-                    "name": "Eggs and Dairy",
-                    "description": "Contains eggs and dairy products. Additionally includes doughs"
+                    "name": "Eggs",
+                    "description": "Contains eggs"
+                },
+                {
+                    "name": "Dairy",
+                    "description": "Contains dairy products. Additionally includes ready doughs and yeast."
                 },
                 {
                     "name": "Nuts",
