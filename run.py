@@ -182,6 +182,7 @@ def main():
 
     ha_interface.drop_shopping_list(drop_complete=False)
     ha_interface.add_to_shopping_list(new_shopping_list)
+    ha_interface.add_to_shopping_list("--- END ---")
 
 if __name__ == "__main__":
     main()
