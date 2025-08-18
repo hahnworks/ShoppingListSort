@@ -2,6 +2,7 @@
 
 Sort your Home Assistant shopping list by store and aisle using OpenAIs GPT models!
 
+![Shopping List Sort Demo](.readme_assets/demo.gif)
 
 ## Motivation
 
