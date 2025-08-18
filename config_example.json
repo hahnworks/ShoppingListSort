@@ -14,8 +14,8 @@
     },
     "stores": [
         {
-            "name": "EDEKA",
-            "description": "A generic german supermarket.",
+            "name": "Supermarket",
+            "description": "A generic supermarket.",
             "aisles": [
                 {
                     "name": "Fruits and Vegetables",
@@ -84,12 +84,8 @@
             ]
         },
         {
-            "name": "Mix Markt",
-            "description": "A supermarket focusing on russian and east european food. Has a great supply of vegetables. Prefer vegetables from here"
-        },
-        {
-            "name": "IKEA",
-            "description": "A furniture store.",
+            "name": "Swedish furniture store",
+            "description": "A well-known swedish furniture store, selling furniture and home accessories.",
             "aisles": [
                 {
                     "name": "Kitchen accessories",
@@ -126,7 +122,7 @@
             ]
         },
         {
-            "name": "Hornbach",
+            "name": "Hardware Store",
             "description": "A store for home improvement and repair supplies.",
             "aisles": [
                 {
