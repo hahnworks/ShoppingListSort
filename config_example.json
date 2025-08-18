@@ -9,7 +9,7 @@
             "key": "your_openai_api_key",
             "model": "gpt-4.1-mini",
             "retries_on_item_drop": 3,
-            "system_message": "Your task is to sort a grocery item list based on the provided stores and their layout.\nAssign every item a store and (if applicable) a specific aisle.\nUse only the aisles specified in the following JSON.\nDO NOT INVENT ANY NEW AISLES.\nIf unsure, use \"Miscellaneous\" as the aisle.\n"
+            "system_message": "Your task is to sort a grocery item list based on the provided stores and their layout.\nAssign every item a store and (if applicable) a specific aisle.\nUse only the aisles specified in the following JSON.\nDO NOT INVENT ANY NEW AISLES.\n"
         }
     },
     "stores": [
@@ -140,6 +140,16 @@
                 {
                     "name": "Miscellaneous",
                     "description": "Contains various household items and decor."
+                }
+            ]
+        },
+        {
+            "name": "Unknown",
+            "description": "Unknown items",
+            "aisles": [
+                {
+                    "name": "Miscellaneous",
+                    "description": "Contains various items that do not fit into other categories."
                 }
             ]
         }
