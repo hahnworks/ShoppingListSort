@@ -84,6 +84,70 @@ class OpenAIInterface:
 
         return response.output_parsed
 
+class ShoppingListSorter:
+    def __init__(self, config):
+        self.config = config
+
+        domain = re.match(r"https?://([^/]+)", config["api"]["homeassistant"]["url"]).group(1)
+        self.config["api"]["homeassistant"]["url"] = f"https://{domain}/api/"
+
+        self.ha_interface = HomeAssistantInterface(
+            api_url=config['api']['homeassistant']['url'],
+            api_key=config['api']['homeassistant']['key']
+        )
+        self.oai_interface = OpenAIInterface(
+            api_key=config['api']['openai']['key'],
+            model = config['api']['openai']['model'],
+            system_message=generate_system_message(config["api"]["openai"]["system_message"], config["stores"])
+        )
+
+    def get_categorized_item_list_from_llm(self, item_list):
+            response = self.oai_interface.call(json.dumps(item_list), format=Items)
+            json_data = json.loads(response.model_dump_json())
+            item_major_list = json_data["items"]
+
+            # “transpose” to store aisles major format
+            location_major_list = item_major2location_major(item_major_list, self.config["stores"])
+            new_shopping_list = shopping_list_from_json(location_major_list)
+
+            return new_shopping_list
+
+    def sort(self):
+        current_shopping_list = self.ha_interface.get_shopping_list()
+
+        clean_item_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
+
+        tries = 0
+        success = False
+        categorized_item_list = []
+
+        while tries < self.config['api']['openai']['retries_on_item_drop']:
+
+            categorized_item_list = self.get_categorized_item_list_from_llm(clean_item_list)
+
+            # prepare clean shopping list, to check whether the LLM has dropped any items
+            clean_new_item_list = [s for s in categorized_item_list if s[0] not in ["+", "-", "="]]
+
+            if sorted(clean_item_list) != sorted(clean_new_item_list):
+                print("Warning: Items have been dropped by the model!")
+                tries += 1
+                print("Retrying...")
+            else:
+                success = True
+                break
+        if not success:
+            print("Error: Item sorting failed after multiple attempts.")
+            print("Consider using a more complex model.")
+            return
+
+        for s in categorized_item_list:
+            print(s)
+
+        self.ha_interface.drop_shopping_list(drop_complete=False)
+        self.ha_interface.add_to_shopping_list(categorized_item_list)
+        self.ha_interface.add_to_shopping_list("--- END ---")
+
+
 def generate_system_message(system_message, stores):
     system_prompt = system_message
     system_prompt += json.dumps(stores, indent=4)
@@ -128,61 +192,9 @@ def main():
     with open('config.json', 'r') as config_file:
         config = json.load(config_file)
 
-    domain = re.match(r"https?://([^/]+)", config["api"]["homeassistant"]["url"]).group(1)
-    config["api"]["homeassistant"]["url"] = f"https://{domain}/api/"
+    sorter = ShoppingListSorter(config)
+    sorter.sort()
 
-    ha_interface = HomeAssistantInterface(
-        api_url=config['api']['homeassistant']['url'],
-        api_key=config['api']['homeassistant']['key']
-    )
-    oai_interface = OpenAIInterface(
-        api_key=config['api']['openai']['key'],
-        model = config['api']['openai']['model'],
-        system_message=generate_system_message(config["api"]["openai"]["system_message"], config["stores"])
-    )
-
-    current_shopping_list = ha_interface.get_shopping_list()
-
-    print(json.dumps(current_shopping_list, indent=4))
-
-    clean_shopping_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
-
-    tries = 0
-    item_major_list = []
-    success = False
-
-    new_shopping_list = []
-
-    while tries < config['api']['openai']['retries_on_item_drop']:
-        response = oai_interface.call(json.dumps(clean_shopping_list), format=Items)
-        json_data = json.loads(response.model_dump_json())
-        item_major_list = json_data["items"]
-
-        # “transpose” to store aisles major format
-        location_major_list = item_major2location_major(item_major_list, config["stores"])
-        new_shopping_list = shopping_list_from_json(location_major_list)
-
-        # prepare clean shopping list, to check whether the LLM has dropped any items
-        clean_new_shopping_list = [s for s in new_shopping_list if s[0] not in ["+", "-", "="]]
-
-        if sorted(clean_shopping_list) != sorted(clean_new_shopping_list):
-            print("Warning: Items have been dropped by the model!")
-            tries += 1
-            print("Retrying...")
-        else:
-            success = True
-            break
-    if not success:
-        print("Error: Item sorting failed after multiple attempts.")
-        print("Consider using a more complex model.")
-        return
-
-    for s in new_shopping_list:
-        print(s)
-
-    ha_interface.drop_shopping_list(drop_complete=False)
-    ha_interface.add_to_shopping_list(new_shopping_list)
-    ha_interface.add_to_shopping_list("--- END ---")
 
 if __name__ == "__main__":
     main()
