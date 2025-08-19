@@ -24,7 +24,7 @@ Sort your Home Assistant shopping list by store and aisle using OpenAIs GPT mode
 While the Shopping List integration in Home Assistant is very convenient when sharing a shopping list and communicating efficiently which groceries or supplies have to be bought, it lacks any ordering.
 Creating multiple shopping list is cumbersome, and walking through the aisles forth and back to find the items takes time.
 
-Thanks to recent hype in Large Language Models (commonly called AI, although I dislike this term...) we can let the sorting be performed by a language model and still have the freedom of free text input for our shopping lists!
+Thanks to recent hype in Large Language Models (“AI”) we can let the sorting be performed by a language model and still have the freedom of free text input for our shopping lists!
 
 You have to define a list of stores and aisles. See the [Configuration Section](#configuration) for help.
 
@@ -34,7 +34,7 @@ As this application currently is not a Home Assistant integration, but merely us
 
 By default, ShoppingListSort listens for new items.
 You can add `!sort` to your shopping list, which triggers the resorting.
-Every item starting with `+`, `-`, `=` and `!` is ignored and dropped, as these are consider as formatting.
+Every item starting with `+`, `-`, `=` and `!` is ignored and dropped, as these are considered as formatting.
 
 To start listening, set up the [configuration](#configuration) and call `python ShoppingListSort.py`.
 
