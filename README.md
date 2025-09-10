@@ -109,7 +109,7 @@ Here is a shortened version of the `stores` section in `config_example.json` for
                 "description": "Contains various pieces of furniture."
             }
         ]
-    },
+    }
 ]
 ```
 
