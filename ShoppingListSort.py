@@ -81,10 +81,11 @@ class HomeAssistantInterface:
         self.drop_from_shopping_list([i["name"] for i in shopping_list if not i["complete"] or drop_complete])
 
 class OpenAIInterface:
-    def __init__(self, api_key, system_message = "You are a helpful assistant.", model="gpt-4.1"):
+    def __init__(self, api_key, system_message = "You are a helpful assistant.", model="gpt-4.1", temperature=0.):
         self.client = OpenAI(api_key=api_key)
         self.system_message = system_message
         self.model = model
+        self.temperature = temperature
 
     def call(self, message, format=Item):
         # https://platform.openai.com/docs/guides/structured-outputs
@@ -96,6 +97,7 @@ class OpenAIInterface:
 
         response = self.client.responses.parse(
             model=self.model,
+            temperature=self.temperature,
             input=input,
             text_format=format
         )
@@ -116,7 +118,8 @@ class ShoppingListSorter:
         self.oai_interface = OpenAIInterface(
             api_key=config['api']['openai']['key'],
             model = config['api']['openai']['model'],
-            system_message=generate_system_message(config["api"]["openai"]["system_message"], config["stores"])
+            temperature=config["api"]["openai"]["temperature"],
+            system_message=generate_system_message(config["api"]["openai"]["system_message"], config["stores"]),
         )
     def _item_major2location_major(self, item_major_list, stores):
         location_major_list = []
