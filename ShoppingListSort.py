@@ -167,7 +167,11 @@ class ShoppingListSorter:
             return new_shopping_list
 
     def sort(self):
-        current_shopping_list = self.ha_interface.get_shopping_list()
+        try:
+            current_shopping_list = self.ha_interface.get_shopping_list()
+        except Exception as e:
+            print(f"Error getting current shopping list: {e}")
+            return False
 
         clean_item_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "=", "!"])]
 
@@ -177,7 +181,11 @@ class ShoppingListSorter:
 
         while tries < self.config['api']['openai']['retries_on_item_drop']:
 
-            categorized_item_list = self._get_categorized_item_list_from_llm(clean_item_list)
+            try:
+                categorized_item_list = self._get_categorized_item_list_from_llm(clean_item_list)
+            except Exception as e:
+                print(f"Error during LLM call: {e}")
+                return False
 
             # prepare clean shopping list, to check whether the LLM has dropped any items
             clean_new_item_list = [s for s in categorized_item_list if s[0] not in ["+", "-", "=", "!"]]
@@ -203,7 +211,13 @@ class ShoppingListSorter:
         if verbose:
             print("Listening...")
         while True:
-            current_shopping_list = self.ha_interface.get_shopping_list()
+            try: 
+                current_shopping_list = self.ha_interface.get_shopping_list()
+            except Exception as e:
+                print(f"Error: {e}")
+                sleep(self.config['api']['homeassistant']['fetch_interval'])
+                continue
+
             clean_item_list = [i['name'] for i in current_shopping_list if not i['complete'] and (i['name'][0] not in ["+", "-", "="])]
 
             if "!sort" in clean_item_list:
